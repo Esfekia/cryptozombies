@@ -45,7 +45,7 @@ contract ZombieFactory {
 
 }
 
-//Chapter 7 Create a public function named createZombie. It should take two parameters: _name (a string), and _dna (a uint). 
+//Chapter 7: Create a public function named createZombie. It should take two parameters: _name (a string), and _dna (a uint). 
 //Don't forget to pass the first argument by value by using the memory keyword
 
 pragma solidity >=0.5.0 <0.6.0;
@@ -66,4 +66,28 @@ contract ZombieFactory {
     function createZombie(string memory _name, uint _dna) public {
         
     }
+}
+
+//Chapter 8: Fill in the function body so it creates a new Zombie, and adds it to the zombies array. 
+//The name and dna for the new Zombie should come from the function arguments.
+
+pragma solidity >=0.5.0 <0.6.0;
+
+contract ZombieFactory {
+
+    uint dnaDigits = 16;
+    uint dnaModulus = 10 ** dnaDigits;
+
+    struct Zombie {
+        string name;
+        uint dna;
+    }
+
+    Zombie[] public zombies;
+
+    function createZombie (string memory _name, uint _dna) public {
+        // start here
+        zombies.push(Zombie(_name, _dna));
+    }
+
 }
