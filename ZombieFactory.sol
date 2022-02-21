@@ -2,27 +2,24 @@
 pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory {
-
-    uint dnaDigits = 16;
+    uint256 dnaDigits = 16;
     //start here
-    uint dnaModulus = 10 ** dnaDigits;
+    uint256 dnaModulus = 10**dnaDigits;
 }
 
 //Chapter 5: Create a struct named Zombie.
 //Our Zombie struct will have 2 properties: name (a string), and dna (a uint).
 
-
 pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory {
-
-    uint dnaDigits = 16;
-    uint dnaModulus = 10 ** dnaDigits;
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
 
     // start here
     struct Zombie {
         string name;
-        uint dna;
+        uint256 dna;
     }
 }
 
@@ -30,64 +27,79 @@ contract ZombieFactory {
 pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory {
-
-    uint dnaDigits = 16;
-    uint dnaModulus = 10 ** dnaDigits;
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
 
     struct Zombie {
         string name;
-        uint dna;
+        uint256 dna;
     }
 
     Zombie[] public zombies;
 
     // start here
-
 }
 
-//Chapter 7: Create a public function named createZombie. It should take two parameters: _name (a string), and _dna (a uint). 
+//Chapter 7: Create a public function named createZombie. It should take two parameters: _name (a string), and _dna (a uint).
 //Don't forget to pass the first argument by value by using the memory keyword
 
 pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory {
-
-    uint dnaDigits = 16;
-    uint dnaModulus = 10 ** dnaDigits;
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
 
     struct Zombie {
         string name;
-        uint dna;
+        uint256 dna;
     }
 
     Zombie[] public zombies;
 
     // start here
-    function createZombie(string memory _name, uint _dna) public {
-        
-    }
+    function createZombie(string memory _name, uint256 _dna) public {}
 }
 
-//Chapter 8: Fill in the function body so it creates a new Zombie, and adds it to the zombies array. 
+//Chapter 8: Fill in the function body so it creates a new Zombie, and adds it to the zombies array.
 //The name and dna for the new Zombie should come from the function arguments.
 
 pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory {
-
-    uint dnaDigits = 16;
-    uint dnaModulus = 10 ** dnaDigits;
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
 
     struct Zombie {
         string name;
-        uint dna;
+        uint256 dna;
     }
 
     Zombie[] public zombies;
 
-    function createZombie (string memory _name, uint _dna) public {
+    function createZombie(string memory _name, uint256 _dna) public {
         // start here
         zombies.push(Zombie(_name, _dna));
     }
+}
 
+//Chapter 9: Our contract's createZombie function is currently public by default —
+//this means anyone could call it and create a new Zombie in our contract! Let's make it private.
+//Modify createZombie so it's a private function. Don't forget the naming convention!
+
+pragma solidity >=0.5.0 <0.6.0;
+
+contract ZombieFactory {
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
+
+    struct Zombie {
+        string name;
+        uint256 dna;
+    }
+
+    Zombie[] public zombies;
+
+    function _createZombie(string memory _name, uint256 _dna) private {
+        zombies.push(Zombie(_name, _dna));
+    }
 }
