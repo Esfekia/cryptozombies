@@ -132,3 +132,37 @@ contract ZombieFactory {
         returns (uint256)
     {}
 }
+
+//Chapter11: Let's fill in the body of our _generateRandomDna function! Here's what it should do:
+//The first line of code should take the keccak256 hash of abi.encodePacked(_str) to generate a pseudo-random hexadecimal,
+//typecast it as a uint, and finally store the result in a uint called rand.
+//We want our DNA to only be 16 digits long (remember our dnaModulus?).
+//So the second line of code should return the above value modulus (%) dnaModulus.
+
+pragma solidity ^0.4.25;
+
+contract ZombieFactory {
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
+
+    struct Zombie {
+        string name;
+        uint256 dna;
+    }
+
+    Zombie[] public zombies;
+
+    function _createZombie(string memory _name, uint256 _dna) private {
+        zombies.push(Zombie(_name, _dna));
+    }
+
+    function _generateRandomDna(string memory _str)
+        private
+        view
+        returns (uint256)
+    {
+        // start here
+        uint256 rand = uint256(keccak256(abi.encodePacked(_str)));
+        return rand % dnaModulus;
+    }
+}
