@@ -103,3 +103,32 @@ contract ZombieFactory {
         zombies.push(Zombie(_name, _dna));
     }
 }
+
+//Chapter 10: We're going to want a helper function that generates a random DNA number from a string.
+//Create a private function called _generateRandomDna. It will take one parameter named _str (a string), and return a uint.
+//Don't forget to set the data location of the _str parameter to memory.
+//This function will view some of our contract's variables but not modify them, so mark it as view.
+pragma solidity >=0.5.0 <0.6.0;
+
+contract ZombieFactory {
+    uint256 dnaDigits = 16;
+    uint256 dnaModulus = 10**dnaDigits;
+
+    struct Zombie {
+        string name;
+        uint256 dna;
+    }
+
+    Zombie[] public zombies;
+
+    function _createZombie(string memory _name, uint256 _dna) private {
+        zombies.push(Zombie(_name, _dna));
+    }
+
+    // start here
+    function _generateRandomDna(string memory _str)
+        private
+        view
+        returns (uint256)
+    {}
+}
