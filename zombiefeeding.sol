@@ -2,8 +2,7 @@ pragma solidity >=0.5.0 <0.6.0;
 
 import "./zombiefactory.sol";
 
-// Create KittyInterface here
-contract KittyInterface{
+contract KittyInterface {
   function getKitty(uint256 _id) external view returns (
     bool isGestating,
     bool isReady,
@@ -15,11 +14,14 @@ contract KittyInterface{
     uint256 sireId,
     uint256 generation,
     uint256 genes
-);
-
+  );
 }
 
 contract ZombieFeeding is ZombieFactory {
+
+  address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
+  // Initialize kittyContract here using `ckAddress` from above
+  KittyInterface kittyContract =KittyInterface(ckAddress);
 
   function feedAndMultiply(uint _zombieId, uint _targetDna) public {
     require(msg.sender == zombieToOwner[_zombieId]);
@@ -53,3 +55,8 @@ We've looked up the CryptoKitties source code for you, and found a function call
 Define an interface called KittyInterface. Remember, this looks just like creating a new contract — we use the contract keyword.
 
 Inside the interface, define the function getKitty (which should be a copy/paste of the function above, but with a semi-colon after the returns statement, instead of everything inside the curly braces.
+
+//Chapter 2. 11 Let's set up our contract to read from the CryptoKitties smart contract!
+
+I've saved the address of the CryptoKitties contract in the code for you, under a variable named ckAddress. 
+In the next line, create a KittyInterface named kittyContract, and initialize it with ckAddress — just like we did with numberContract above.
