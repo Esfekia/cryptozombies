@@ -2,13 +2,28 @@ pragma solidity >=0.5.0 <0.6.0;
 
 import "./zombiefactory.sol";
 
+// Create KittyInterface here
+contract KittyInterface{
+  function getKitty(uint256 _id) external view returns (
+    bool isGestating,
+    bool isReady,
+    uint256 cooldownIndex,
+    uint256 nextActionAt,
+    uint256 siringWithId,
+    uint256 birthTime,
+    uint256 matronId,
+    uint256 sireId,
+    uint256 generation,
+    uint256 genes
+);
+
+}
+
 contract ZombieFeeding is ZombieFactory {
 
   function feedAndMultiply(uint _zombieId, uint _targetDna) public {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
-    //Chapter 2.8 Let's Finish feedAndMultiply section
-    // start here
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
     _createZombie("NoName", newDna);
@@ -33,3 +48,8 @@ So the next thing our function should do is declare a local Zombie named myZombi
 Set this variable to be equal to index _zombieId in our zombies array.
 /*
 
+//Chapter 2.10 Get the CryptoKitty DNA
+We've looked up the CryptoKitties source code for you, and found a function called getKitty that returns all the kitty's data, including its "genes" (which is what our zombie game needs to form a new zombie!).
+Define an interface called KittyInterface. Remember, this looks just like creating a new contract — we use the contract keyword.
+
+Inside the interface, define the function getKitty (which should be a copy/paste of the function above, but with a semi-colon after the returns statement, instead of everything inside the curly braces.
