@@ -19,18 +19,22 @@ contract KittyInterface {
 
 contract ZombieFeeding is ZombieFactory {
 
-  address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
-  KittyInterface kittyContract = KittyInterface(ckAddress);
+  // 1. Remove this:
+ 
+  // 2. Change this to just a declaration:
+  KittyInterface kittyContract;
 
-  // Modify function definition here:
+  // 3. Add setKittyContractAddress method here
+  function setKittyContractAddress(address _address) external {
+    kittyContract = KittyInterface(_address);
+  }
   function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
-    // Add an if statement here
     if (keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
-      newDna = newDna - newDna % 100 +99;
+      newDna = newDna - newDna % 100 + 99;
     }
     _createZombie("NoName", newDna);
   }
@@ -38,11 +42,11 @@ contract ZombieFeeding is ZombieFactory {
   function feedOnKitty(uint _zombieId, uint _kittyId) public {
     uint kittyDna;
     (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
-    // And modify function call here:
     feedAndMultiply(_zombieId, kittyDna, "kitty");
   }
 
 }
+
 
 
 //Chapter 2.7 Storage vs Memory
@@ -95,3 +99,14 @@ Inside the if statement, we want to replace the last 2 digits of DNA with 99. On
 Explanation: Assume newDna is 334455. Then newDna % 100 is 55, so newDna - newDna % 100 is 334400. Finally add 99 to get 334499.
 
 Lastly, we need to change the function call inside feedOnKitty. When it calls feedAndMultiply, add the parameter "kitty" to the end.
+
+//Chapter 3.1: Immutability of Contracts: 
+Let's update our code from Lesson 2 to be able to change the CryptoKitties contract address.
+
+Delete the line of code where we hard-coded ckAddress.
+
+Change the line where we created kittyContract to just declare the variable — i.e. don't set it equal to anything.
+
+Create a function called setKittyContractAddress. It will take one argument, _address (an address), and it should be an external function.
+
+Inside the function, add one line of code that sets kittyContract equal to KittyInterface(_address).
