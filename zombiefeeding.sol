@@ -22,19 +22,24 @@ contract ZombieFeeding is ZombieFactory {
   address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
   KittyInterface kittyContract = KittyInterface(ckAddress);
 
-  function feedAndMultiply(uint _zombieId, uint _targetDna) public {
+  // Modify function definition here:
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
+    // Add an if statement here
+    if (keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
+      newDna = newDna - newDna % 100 +99;
+    }
     _createZombie("NoName", newDna);
   }
 
-  // define function here
   function feedOnKitty(uint _zombieId, uint _kittyId) public {
     uint kittyDna;
     (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
-    feedAndMultiply(_zombieId, kittyDna);
+    // And modify function call here:
+    feedAndMultiply(_zombieId, kittyDna, "kitty");
   }
 
 }
@@ -79,3 +84,14 @@ The function should first declare a uint named kittyDna.
 The function should then call the kittyContract.getKitty function with _kittyId and store genes in kittyDna. Remember — getKitty returns a ton of variables. (10 to be exact — I'm nice, I counted them for you!). But all we care about is the last one, genes. Count your commas carefully!
 
 Finally, the function should call feedAndMultiply, and pass it both _zombieId and kittyDna.
+
+//Chapter 13. Bonus Kitty Genes - using if statement
+First, let's change the function definition for feedAndMultiply so it takes a 3rd argument: a string named _species which we'll store in memory.
+
+Next, after we calculate the new zombie's DNA, let's add an if statement comparing the keccak256 hashes of _species and the string "kitty". We can't directly pass strings to keccak256. Instead, we will pass abi.encodePacked(_species) as an argument on the left side and abi.encodePacked("kitty") as an argument on the right side.
+
+Inside the if statement, we want to replace the last 2 digits of DNA with 99. One way to do this is using the logic: newDna = newDna - newDna % 100 + 99;.
+
+Explanation: Assume newDna is 334455. Then newDna % 100 is 55, so newDna - newDna % 100 is 334400. Finally add 99 to get 334499.
+
+Lastly, we need to change the function call inside feedOnKitty. When it calls feedAndMultiply, add the parameter "kitty" to the end.
