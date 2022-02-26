@@ -19,15 +19,13 @@ contract KittyInterface {
 
 contract ZombieFeeding is ZombieFactory {
 
-  // 1. Remove this:
- 
-  // 2. Change this to just a declaration:
   KittyInterface kittyContract;
 
-  // 3. Add setKittyContractAddress method here
-  function setKittyContractAddress(address _address) external {
+  // Modify this function:
+  function setKittyContractAddress(address _address) external onlyOwner {
     kittyContract = KittyInterface(_address);
   }
+
   function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
@@ -110,3 +108,8 @@ Change the line where we created kittyContract to just declare the variable — 
 Create a function called setKittyContractAddress. It will take one argument, _address (an address), and it should be an external function.
 
 Inside the function, add one line of code that sets kittyContract equal to KittyInterface(_address).
+
+//Chapter 3.3 onlyOwner Function Modifier
+//Now we can restrict access to setKittyContractAddress so that no one but us can modify it in the future.
+
+//Add the onlyOwner modifier to setKittyContractAddress.
