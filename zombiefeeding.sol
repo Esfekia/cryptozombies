@@ -25,25 +25,28 @@ contract ZombieFeeding is ZombieFactory {
     kittyContract = KittyInterface(_address);
   }
 
-  // 1. Define `_triggerCooldown` function here
-  function _triggerCooldown(Zombie storage _zombie) internal{
-      _zombie.readyTime = uint32(now + cooldownTime);
+  function _triggerCooldown(Zombie storage _zombie) internal {
+    _zombie.readyTime = uint32(now + cooldownTime);
   }
 
-  // 2. Define `_isReady` function here
-  function _isReady(Zombie storage _zombie)internal view returns(bool){
+  function _isReady(Zombie storage _zombie) internal view returns (bool) {
       return (_zombie.readyTime <= now);
   }
 
-  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
+  // 1. Make this function internal
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
+    // 2. Add a check for `_isReady` here
+    require (_isReady(myZombie));
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
     if (keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
       newDna = newDna - newDna % 100 + 99;
     }
     _createZombie("NoName", newDna);
+    // 3. Call `_triggerCooldown`
+    _triggerCooldown(myZombie);
   }
 
   function feedOnKitty(uint _zombieId, uint _kittyId) public {
@@ -130,3 +133,10 @@ The function body should set _zombie.readyTime to uint32(now + cooldownTime).
 Next, create a function called _isReady. This function will also take a Zombie storage argument named _zombie. It will be an internal view function, and return a bool.
 
 The function body should return (_zombie.readyTime <= now), which will evaluate to either true or false. This function will tell us if enough time has passed since the last time the zombie fed.
+
+Chapter 3.7 : Public Functions and Security:
+Currently feedAndMultiply is a public function. Let's make it internal so that the contract is more secure. We don't want users to be able to call this function with any DNA they want.
+
+Let's make feedAndMultiply take our cooldownTime into account. First, after we look up myZombie, let's add a require statement that checks _isReady() and passes myZombie to it. This way the user can only execute this function if a zombie's cooldown time is over.
+
+At the end of the function let's call _triggerCooldown(myZombie) so that feeding triggers the zombie's cooldown time.
