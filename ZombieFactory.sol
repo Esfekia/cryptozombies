@@ -1,19 +1,18 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-// 1. Import here
 import "./ownable.sol";
 
-// 2. Inherit here:
 contract ZombieFactory is Ownable {
     event NewZombie(uint256 zombieId, string name, uint256 dna);
 
     uint256 dnaDigits = 16;
     uint256 dnaModulus = 10**dnaDigits;
+    // 1. Define `cooldownTime` here
+    uint256 cooldownTime = 1 days;
 
     struct Zombie {
         string name;
         uint256 dna;
-        // Add new data here
         uint32 level;
         uint32 readyTime;
     }
@@ -24,7 +23,10 @@ contract ZombieFactory is Ownable {
     mapping(address => uint256) ownerZombieCount;
 
     function _createZombie(string memory _name, uint256 _dna) internal {
-        uint256 id = zombies.push(Zombie(_name, _dna)) - 1;
+        // 2. Update the following line:
+        uint256 id = zombies.push(
+            Zombie(_name, _dna, 1, uint32(now + cooldownTime))
+        ) - 1;
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender]++;
         emit NewZombie(id, _name, _dna);
@@ -61,3 +63,17 @@ contract ZombieFactory is Ownable {
 
 //Add two more properties to our Zombie struct: level (a uint32), and readyTime (also a uint32). We want to pack these data types together, so let's put them at the end of the struct.
 //32 bits is more than enough to hold the zombie's level and timestamp, so this will save us some gas costs by packing the data more tightly than using a regular uint (256-bits).
+
+//Chapter 3.5 Time Units
+//Let's add a cooldown time to our DApp, and make it so zombies have to wait 1 day after attacking or feeding to attack again.
+
+//Declare a uint called cooldownTime, and set it equal to 1 days. (Forgive the poor grammar — if you set it equal to "1 day", it won't compile!)
+
+//Since we added a level and readyTime to our Zombie struct in the previous chapter, we need to update _createZombie() to use the correct number of arguments when we create a new Zombie struct.
+
+//Update the zombies.push line of code to add 2 more arguments: 1 (for level), and uint32(now + cooldownTime) (for readyTime).
+
+//Note: The uint32(...) is necessary because now returns a uint256 by default. So we need to explicitly convert it to a uint32.
+
+//now + cooldownTime will equal the current unix timestamp (in seconds) plus the number of seconds in 1 day — which will equal the unix timestamp 1 day from now.
+//Later we can compare to see if this zombie's readyTime is greater than now to see if enough time has passed to use the zombie again.
