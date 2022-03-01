@@ -33,14 +33,7 @@ contract ZombieHelper is ZombieFeeding {
     }
 }
 
-//Chapter 3.9
-//In ZombieHelper, create a modifier called aboveLevel. It will take 2 arguments, _level (a uint) and _zombieId (also a uint).
-
-//The body should check to make sure zombies[_zombieId].level is greater than or equal to _level.
-
-//Remember to have the last line of the modifier call the rest of the function with _;.
-
-//Chapter 3.10
+//Chapter 3.99
 //Create a function called changeName. It will take 2 arguments: _zombieId (a uint), and _newName (a string with the data location set to calldata ), and make it external.
 //It should have the aboveLevel modifier, and should pass in 2 for the _level parameter. (Don't forget to also pass the _zombieId).
 //Note: calldata is somehow similar to memory, but it's only available to external functions.
