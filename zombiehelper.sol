@@ -10,7 +10,6 @@ pragma solidity >=0.5.0 <0.6.0;
 import "./zombiefeeding.sol";
 
 contract ZombieHelper is ZombieFeeding {
-    // 1. Define levelUpFee here
     uint256 levelUpFee = 0.001 ether;
 
     modifier aboveLevel(uint256 _level, uint256 _zombieId) {
@@ -18,7 +17,17 @@ contract ZombieHelper is ZombieFeeding {
         _;
     }
 
-    // 2. Insert levelUp function here
+    // 1. Create withdraw function here
+    function withdraw() external onlyOwner {
+        address payable _owner = address(uint160(owner()));
+        _owner.transfer(address(this).balance);
+    }
+
+    // 2. Create setLevelUpFee function here
+    function setLevelUpFee(uint256 _fee) external onlyOwner {
+        levelUpFee = _fee;
+    }
+
     function levelUp(uint256 _zombieId) external payable {
         require(msg.value == levelUpFee);
         zombies[_zombieId].level++;
@@ -91,11 +100,18 @@ contract ZombieHelper is ZombieFeeding {
 //Increment counter by 1 (see the for loop example above).
 //That's it — the function will now return all the zombies owned by _owner without spending any gas.
 
-/*Chapter 4.1
+/*Chapter 4.1 Payable
 Let's create a payable function in our zombie game.
 Let's say our game has a feature where users can pay ETH to level up their zombies. The ETH will get stored in the contract, which you own — this a simple example of how you could make money on your games!
 Define a uint named levelUpFee, and set it equal to 0.001 ether.
 Create a function named levelUp. It will take one parameter, _zombieId, a uint. It should be external and payable.
 The function should first require that msg.value is equal to levelUpFee.
 It should then increment this zombie's level: zombies[_zombieId].level++.
+*/
+/*Chapter 4.2 Withdraws
+Create a withdraw function in our contract, which should be identical to the GetPaid example above.
+The price of Ether has gone up over 10x in the past year. So while 0.001 ether is about $1 at the time of this writing, if it goes up 10x again, 0.001 ETH will be $10 and our game will be a lot more expensive.
+So it's a good idea to create a function that allows us as the owner of the contract to set the levelUpFee.
+a. Create a function called setLevelUpFee that takes one argument, uint _fee, is external, and uses the modifier onlyOwner.
+b. The function should set levelUpFee equal to _fee.
 */
