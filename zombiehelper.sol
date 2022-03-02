@@ -36,8 +36,15 @@ contract ZombieHelper is ZombieFeeding {
         view
         returns (uint256[] memory)
     {
-        // Start here
         uint256[] memory result = new uint256[](ownerZombieCount[_owner]);
+        // Start here
+        uint256 counter = 0;
+        for (uint256 i = 0; i < zombies.length; i++) {
+            if (zombieToOwner[i] == _owner) {
+                result[counter] = i;
+                counter++;
+            }
+        }
         return result;
     }
 }
@@ -65,3 +72,13 @@ contract ZombieHelper is ZombieFeeding {
 //Declare a uint[] memory variable called result
 //Set it equal to a new uint array. The length of the array should be however many zombies this _owner owns, which we can look up from our mapping with: ownerZombieCount[_owner].
 //At the end of the function return result. It's just an empty array right now, but in the next chapter we'll fill it in.
+
+//Chapter 3.12
+//Let's finish our getZombiesByOwner function by writing a for loop that iterates through all the zombies in our DApp, compares their owner to see if we have a match, and pushes them to our result array before returning it.
+//Declare a uint called counter and set it equal to 0. We'll use this variable to keep track of the index in our result array.
+//Declare a for loop that starts from uint i = 0 and goes up through i < zombies.length. This will iterate over every zombie in our array.
+//Inside the for loop, make an if statement that checks if zombieToOwner[i] is equal to _owner. This will compare the two addresses to see if we have a match.
+//Inside the if statement:
+//Add the zombie's ID to our result array by setting result[counter] equal to i.
+//Increment counter by 1 (see the for loop example above).
+//That's it — the function will now return all the zombies owned by _owner without spending any gas.
