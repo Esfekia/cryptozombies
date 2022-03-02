@@ -10,9 +10,18 @@ pragma solidity >=0.5.0 <0.6.0;
 import "./zombiefeeding.sol";
 
 contract ZombieHelper is ZombieFeeding {
+    // 1. Define levelUpFee here
+    uint256 levelUpFee = 0.001 ether;
+
     modifier aboveLevel(uint256 _level, uint256 _zombieId) {
         require(zombies[_zombieId].level >= _level);
         _;
+    }
+
+    // 2. Insert levelUp function here
+    function levelUp(uint256 _zombieId) external payable {
+        require(msg.value == levelUpFee);
+        zombies[_zombieId].level++;
     }
 
     function changeName(uint256 _zombieId, string calldata _newName)
@@ -37,7 +46,6 @@ contract ZombieHelper is ZombieFeeding {
         returns (uint256[] memory)
     {
         uint256[] memory result = new uint256[](ownerZombieCount[_owner]);
-        // Start here
         uint256 counter = 0;
         for (uint256 i = 0; i < zombies.length; i++) {
             if (zombieToOwner[i] == _owner) {
@@ -82,3 +90,12 @@ contract ZombieHelper is ZombieFeeding {
 //Add the zombie's ID to our result array by setting result[counter] equal to i.
 //Increment counter by 1 (see the for loop example above).
 //That's it — the function will now return all the zombies owned by _owner without spending any gas.
+
+/*Chapter 4.1
+Let's create a payable function in our zombie game.
+Let's say our game has a feature where users can pay ETH to level up their zombies. The ETH will get stored in the contract, which you own — this a simple example of how you could make money on your games!
+Define a uint named levelUpFee, and set it equal to 0.001 ether.
+Create a function named levelUp. It will take one parameter, _zombieId, a uint. It should be external and payable.
+The function should first require that msg.value is equal to levelUpFee.
+It should then increment this zombie's level: zombies[_zombieId].level++.
+*/
