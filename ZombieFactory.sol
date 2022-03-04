@@ -3,51 +3,50 @@ pragma solidity >=0.5.0 <0.6.0;
 import "./ownable.sol";
 
 contract ZombieFactory is Ownable {
-    event NewZombie(uint256 zombieId, string name, uint256 dna);
 
-    uint256 dnaDigits = 16;
-    uint256 dnaModulus = 10**dnaDigits;
-    // 1. Define `cooldownTime` here
-    uint256 cooldownTime = 1 days;
+    event NewZombie(uint zombieId, string name, uint dna);
+
+    uint dnaDigits = 16;
+    uint dnaModulus = 10 ** dnaDigits;
+    uint cooldownTime = 1 days;
 
     struct Zombie {
-        string name;
-        uint256 dna;
-        uint32 level;
-        uint32 readyTime;
+      string name;
+      uint dna;
+      uint32 level;
+      uint32 readyTime;
+      // 1. Add new properties here
+      uint16 winCount;
+      uint16 lossCount;
     }
 
     Zombie[] public zombies;
 
-    mapping(uint256 => address) public zombieToOwner;
-    mapping(address => uint256) ownerZombieCount;
+    mapping (uint => address) public zombieToOwner;
+    mapping (address => uint) ownerZombieCount;
 
-    function _createZombie(string memory _name, uint256 _dna) internal {
-        // 2. Update the following line:
-        uint256 id = zombies.push(
-            Zombie(_name, _dna, 1, uint32(now + cooldownTime))
-        ) - 1;
+    function _createZombie(string memory _name, uint _dna) internal {
+        // 2. Modify new zombie creation here:
+        uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender]++;
         emit NewZombie(id, _name, _dna);
     }
 
-    function _generateRandomDna(string memory _str)
-        private
-        view
-        returns (uint256)
-    {
-        uint256 rand = uint256(keccak256(abi.encodePacked(_str)));
+    function _generateRandomDna(string memory _str) private view returns (uint) {
+        uint rand = uint(keccak256(abi.encodePacked(_str)));
         return rand % dnaModulus;
     }
 
     function createRandomZombie(string memory _name) public {
         require(ownerZombieCount[msg.sender] == 0);
-        uint256 randDna = _generateRandomDna(_name);
-        randDna = randDna - (randDna % 100);
+        uint randDna = _generateRandomDna(_name);
+        randDna = randDna - randDna % 100;
         _createZombie(_name, randDna);
     }
+
 }
+
 
 //Chapter 3.2 Ownable Contracts
 //We've gone ahead and copied the code of the Ownable contract into a new file, ownable.sol. Let's go ahead and make ZombieFactory inherit from it.
@@ -77,3 +76,14 @@ contract ZombieFactory is Ownable {
 
 //now + cooldownTime will equal the current unix timestamp (in seconds) plus the number of seconds in 1 day — which will equal the unix timestamp 1 day from now.
 //Later we can compare to see if this zombie's readyTime is greater than now to see if enough time has passed to use the zombie again.
+
+/*
+Chapter 4.9 Zombie Wins and Losses
+Modify our Zombie struct to have 2 more properties:
+a. winCount, a uint16
+b. lossCount, also a uint16
+Note: Remember, since we can pack uints inside structs, we want to use the smallest uints we can get away with. 
+A uint8 is too small, since 2^8 = 256 — if our zombies attacked once per day, they could overflow this within a year. 
+But 2^16 is 65536 — so unless a user wins or loses every day for 179 years straight, we should be safe here.
+Now that we have new properties on our Zombie struct, we need to change our function definition in _createZombie().
+Change the zombie creation definition so it creates each new zombie with 0 wins and 0 losses.
