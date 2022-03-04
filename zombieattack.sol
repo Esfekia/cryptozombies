@@ -15,14 +15,17 @@ contract ZombieAttack is ZombieHelper {
     Zombie storage myZombie = zombies[_zombieId];
     Zombie storage enemyZombie = zombies[_targetId];
     uint rand = randMod(100);
-    // Start here
     if (rand <= attackVictoryProbability) {
       myZombie.winCount++;
       myZombie.level++;
       enemyZombie.lossCount++;
       feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
+    } // start here
+    else {
+      myZombie.lossCount++;
+      enemyZombie.winCount++;
+      _triggerCooldown(myZombie);
     }
-
   }
 }
 
@@ -59,3 +62,15 @@ d. Run the feedAndMultiply function. Check zombiefeeding.sol to see the syntax f
 For the 3rd argument (_species), pass the string "zombie". 
 (It doesn't actually do anything at the moment, but later we could add extra functionality 
 for spawning zombie-based zombies if we wanted to).
+
+Chapter 4.11 Zombie Loss (else statements)
+Add an else statement. If our zombie loses:
+
+a. Increment myZombie's lossCount.
+
+b. Increment enemyZombie's winCount.
+
+c. Run the _triggerCooldown function on myZombie. 
+This way the zombie can only attack once per day. 
+(Remember, _triggerCooldown is already run inside feedAndMultiply. 
+So the zombie's cooldown will be triggered whether he wins or loses.)
