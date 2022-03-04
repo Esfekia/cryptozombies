@@ -9,18 +9,22 @@ contract ZombieAttack is ZombieHelper {
   function randMod(uint _modulus) internal returns(uint) {
     randNonce++;
     return uint(keccak256(abi.encodePacked(now, msg.sender, randNonce))) % _modulus;
-
   }
 
-  // 1. Add modifier here
-    function attack(uint _zombieId, uint _targetId) external ownerOf(_zombieId) {
-    // 2. Start function definition here
+  function attack(uint _zombieId, uint _targetId) external ownerOf(_zombieId) {
     Zombie storage myZombie = zombies[_zombieId];
     Zombie storage enemyZombie = zombies[_targetId];
     uint rand = randMod(100);
+    // Start here
+    if (rand <= attackVictoryProbability) {
+      myZombie.winCount++;
+      myZombie.level++;
+      enemyZombie.lossCount++;
+      feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
+    }
+
   }
 }
-
 
 
 
@@ -44,3 +48,14 @@ a. Declare a Zombie storage named myZombie, and set it equal to zombies[_zombieI
 b. Declare a Zombie storage named enemyZombie, and set it equal to zombies[_targetId].
 We're going to use a random number between 0 and 99 to determine the outcome of our battle. 
 So declare a uint named rand, and set it equal to the result of the randMod function with 100 as an argument.
+
+Chapter 4.10: Zombie Victory!
+Create an if statement that checks if rand is less than or equal to attackVictoryProbability.
+If this condition is true, our zombie wins! So:
+a. Increment myZombie's winCount.
+b. Increment myZombie's level. (Level up!!!!!!!)
+c. Increment enemyZombie's lossCount. (Loser!!!!!! 😫 😫 😫)
+d. Run the feedAndMultiply function. Check zombiefeeding.sol to see the syntax for calling it. 
+For the 3rd argument (_species), pass the string "zombie". 
+(It doesn't actually do anything at the moment, but later we could add extra functionality 
+for spawning zombie-based zombies if we wanted to).
