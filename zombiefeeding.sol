@@ -21,6 +21,13 @@ contract ZombieFeeding is ZombieFactory {
 
   KittyInterface kittyContract;
 
+  // 1. Create modifier here
+  modifier ownerOf (uint _zombieId) {
+    require(msg.sender ==zombieToOwner[_zombieId]);
+    _;
+
+  }
+
   function setKittyContractAddress(address _address) external onlyOwner {
     kittyContract = KittyInterface(_address);
   }
@@ -33,19 +40,17 @@ contract ZombieFeeding is ZombieFactory {
       return (_zombie.readyTime <= now);
   }
 
-  // 1. Make this function internal
-  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal {
-    require(msg.sender == zombieToOwner[_zombieId]);
+  // 2. Add modifier to function definition:
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal ownerOf(_zombieId) {
+    // 3. Remove this line
     Zombie storage myZombie = zombies[_zombieId];
-    // 2. Add a check for `_isReady` here
-    require (_isReady(myZombie));
+    require(_isReady(myZombie));
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
     if (keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
       newDna = newDna - newDna % 100 + 99;
     }
     _createZombie("NoName", newDna);
-    // 3. Call `_triggerCooldown`
     _triggerCooldown(myZombie);
   }
 
@@ -54,7 +59,6 @@ contract ZombieFeeding is ZombieFactory {
     (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
     feedAndMultiply(_zombieId, kittyDna, "kitty");
   }
-
 }
 
 
@@ -140,3 +144,10 @@ Currently feedAndMultiply is a public function. Let's make it internal so that t
 Let's make feedAndMultiply take our cooldownTime into account. First, after we look up myZombie, let's add a require statement that checks _isReady() and passes myZombie to it. This way the user can only execute this function if a zombie's cooldown time is over.
 
 At the end of the function let's call _triggerCooldown(myZombie) so that feeding triggers the zombie's cooldown time.
+
+Chapter 4.6
+Create a modifier called ownerOf. It will take 1 argument, _zombieId (a uint).
+The body should require that msg.sender is equal to zombieToOwner[_zombieId], then continue with the function. 
+You can refer to zombiehelper.sol if you don't remember the syntax for a modifier.
+Change the function definition of feedAndMultiply such that it uses the modifier ownerOf.
+Now that we're using a modifier, you can remove the line require(msg.sender == zombieToOwner[_zombieId]);
