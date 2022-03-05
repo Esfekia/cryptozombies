@@ -5,6 +5,8 @@ import "./erc721.sol";
 
 contract ZombieOwnership is ZombieAttack, ERC721 {
 
+  mapping (uint => address) zombieApprovals;
+
   function balanceOf(address _owner) external view returns (uint256) {
     return ownerZombieCount[_owner];
   }
@@ -13,7 +15,6 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
     return zombieToOwner[_tokenId];
   }
 
-  // Define _transfer() here
   function _transfer(address _from, address _to, uint256 _tokenId) private {
     ownerZombieCount[_to]++;
     ownerZombieCount[_from]--;
@@ -22,13 +23,17 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
   }
 
   function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
-
+    require (zombieToOwner[_tokenId] == msg.sender || zombieApprovals[_tokenId] == msg.sender);
+    
+    _transfer(_from, _to, _tokenId);
   }
 
   function approve(address _approved, uint256 _tokenId) external payable {
 
   }
+
 }
+
 
 
 /*Chapter 5.1:
@@ -72,6 +77,28 @@ I lied, that wasn't the last step. There's one more thing we should do.
 
 The ERC721 spec includes a Transfer event. The last line of this function should fire Transfer with the correct information 
 — check erc721.sol to see what arguments it's expecting to be called with and implement it here.
+
+
+Chapter 5.6:
+First, we want to make sure only the owner or the approved address of a token/zombie can transfer it. 
+Let's define a mapping called zombieApprovals. It should map a uint to an address. 
+This way, when someone that is not the owner calls transferFrom with a _tokenId, 
+we can use this mapping to quickly look up if he is approved to take that token.
+
+Next, let's add a require statement to transferFrom. 
+It should make sure that only the owner or the approved address of a token/zombie can transfer it.
+
+Lastly, don't forget to call _transfer.
+
+Note: Checking that only the owner or the approved address of a token/zombie can transfer 
+it means that at least one of these conditions must be true:
+
+zombieToOwner for _tokenId is equal to msg.sender
+
+or
+
+zombieApprovals for _tokenId is equal to msg.sender
+
 
 contract ERC721 {
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
