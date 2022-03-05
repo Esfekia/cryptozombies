@@ -18,13 +18,13 @@ contract ZombieHelper is ZombieFeeding {
     }
 
     // 1. Create withdraw function here
-    function withdraw() external onlyOwner {
+    function withdraw() external onlyOwnerOf {
         address payable _owner = address(uint160(owner()));
         _owner.transfer(address(this).balance);
     }
 
     // 2. Create setLevelUpFee function here
-    function setLevelUpFee(uint256 _fee) external onlyOwner {
+    function setLevelUpFee(uint256 _fee) external onlyOwnerOf {
         levelUpFee = _fee;
     }
 
