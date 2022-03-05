@@ -29,10 +29,12 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
 
   function approve(address _approved, uint256 _tokenId) external payable onlyOwnerOf(_tokenId) {
     zombieApprovals[_tokenId] = _approved;
+    emit Approval(msg.sender, _approved, _tokenId);
   }
 
 
 }
+
 
 
 /*Chapter 5.1:
@@ -104,7 +106,9 @@ So we need to add the onlyOwnerOf modifier to approve
 
 For the body of the function, set zombieApprovals for _tokenId equal to the _approved address.
 
-
+Chapter 5.8 :
+Let's fire the Approval event. Take a look at the erc721.sol file for the arguments, and be sure to use msg.sender as _owner.
+Great, we have finished our ERC721 implementation!
 contract ERC721 {
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
