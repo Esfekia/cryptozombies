@@ -24,16 +24,15 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
 
   function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
     require (zombieToOwner[_tokenId] == msg.sender || zombieApprovals[_tokenId] == msg.sender);
-    
     _transfer(_from, _to, _tokenId);
   }
 
-  function approve(address _approved, uint256 _tokenId) external payable {
-
+  function approve(address _approved, uint256 _tokenId) external payable onlyOwnerOf(_tokenId) {
+    zombieApprovals[_tokenId] = _approved;
   }
 
-}
 
+}
 
 
 /*Chapter 5.1:
@@ -98,6 +97,12 @@ zombieToOwner for _tokenId is equal to msg.sender
 or
 
 zombieApprovals for _tokenId is equal to msg.sender
+
+Chapter 5.7: 
+In the approve function, we want to make sure only the owner of the token can give someone approval to take it. 
+So we need to add the onlyOwnerOf modifier to approve
+
+For the body of the function, set zombieApprovals for _tokenId equal to the _approved address.
 
 
 contract ERC721 {
