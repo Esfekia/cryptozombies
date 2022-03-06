@@ -7,7 +7,8 @@ contract ZombieAttack is ZombieHelper {
   uint attackVictoryProbability = 70;
 
   function randMod(uint _modulus) internal returns(uint) {
-    randNonce++;
+    // Here's one!
+    randNonce = randNonce.add(1);
     return uint(keccak256(abi.encodePacked(now, msg.sender, randNonce))) % _modulus;
   }
 
@@ -16,18 +17,20 @@ contract ZombieAttack is ZombieHelper {
     Zombie storage enemyZombie = zombies[_targetId];
     uint rand = randMod(100);
     if (rand <= attackVictoryProbability) {
-      myZombie.winCount++;
-      myZombie.level++;
-      enemyZombie.lossCount++;
+      // Here's 3 more!
+      myZombie.winCount = myZombie.winCount.add(1);
+      myZombie.level = myZombie.level.add(1);
+      enemyZombie.lossCount = enemyZombie.lossCount.add(1);
       feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
-    } // start here
-    else {
-      myZombie.lossCount++;
-      enemyZombie.winCount++;
+    } else {
+      // ...annnnd another 2!
+      myZombie.lossCount = myZombie.lossCount.add(1);
+      enemyZombie.winCount = enemyZombie.winCount.add(1);
       _triggerCooldown(myZombie);
     }
   }
 }
+
 
 
 
@@ -74,3 +77,5 @@ c. Run the _triggerCooldown function on myZombie.
 This way the zombie can only attack once per day. 
 (Remember, _triggerCooldown is already run inside feedAndMultiply. 
 So the zombie's cooldown will be triggered whether he wins or loses.)
+
+Chapter 12: replaced ++'s with SafeMath .add()
