@@ -4,6 +4,10 @@ import "./zombieattack.sol";
 import "./erc721.sol";
 import "./safemath.sol";
 
+/// @title A contract that manages transferring zombie ownership.
+/// @author Sertac
+/// @dev Compliant with OpenZeppelin's implementation of the ERC721 spec draft
+/// @dev uses SafeMath libraries for uint256,32 & 16.
 contract ZombieOwnership is ZombieAttack, ERC721 {
 
   using SafeMath for uint256;
@@ -19,10 +23,8 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
   }
 
   function _transfer(address _from, address _to, uint256 _tokenId) private {
-    // 1. Replace with SafeMath's `add`
     ownerZombieCount[_to] = ownerZombieCount[_to].add(1);
-    // 2. Replace with SafeMath's `sub`
-    ownerZombieCount[_from] = ownerZombieCount[_from].sub(1);
+    ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].sub(1);
     zombieToOwner[_tokenId] = _to;
     emit Transfer(_from, _to, _tokenId);
   }
@@ -134,3 +136,5 @@ Add the declaration using SafeMath for uint256;.
   function approve(address _approved, uint256 _tokenId) external payable;
 
 Chapter 5.10 Use SafeMath to replace ++ and --
+
+Chapter 5.13 Added comments using natspec.
