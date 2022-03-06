@@ -1,51 +1,60 @@
 pragma solidity >=0.5.0 <0.6.0;
 
 import "./ownable.sol";
+import "./safemath.sol";
 
 contract ZombieFactory is Ownable {
 
-    event NewZombie(uint zombieId, string name, uint dna);
+  using SafeMath for uint256;
+  // 1. Declare using SafeMath32 for uint32
+  using SafeMath32 for uint32;
+  // 2. Declare using SafeMath16 for uint16
+  using SafeMath16 for uint16;
 
-    uint dnaDigits = 16;
-    uint dnaModulus = 10 ** dnaDigits;
-    uint cooldownTime = 1 days;
+  event NewZombie(uint zombieId, string name, uint dna);
 
-    struct Zombie {
-      string name;
-      uint dna;
-      uint32 level;
-      uint32 readyTime;
-      // 1. Add new properties here
-      uint16 winCount;
-      uint16 lossCount;
-    }
+  uint dnaDigits = 16;
+  uint dnaModulus = 10 ** dnaDigits;
+  uint cooldownTime = 1 days;
 
-    Zombie[] public zombies;
+  struct Zombie {
+    string name;
+    uint dna;
+    uint32 level;
+    uint32 readyTime;
+    uint16 winCount;
+    uint16 lossCount;
+  }
 
-    mapping (uint => address) public zombieToOwner;
-    mapping (address => uint) ownerZombieCount;
+  Zombie[] public zombies;
 
-    function _createZombie(string memory _name, uint _dna) internal {
-        // 2. Modify new zombie creation here:
-        uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
-        zombieToOwner[id] = msg.sender;
-        ownerZombieCount[msg.sender]++;
-        emit NewZombie(id, _name, _dna);
-    }
+  mapping (uint => address) public zombieToOwner;
+  mapping (address => uint) ownerZombieCount;
 
-    function _generateRandomDna(string memory _str) private view returns (uint) {
-        uint rand = uint(keccak256(abi.encodePacked(_str)));
-        return rand % dnaModulus;
-    }
+  function _createZombie(string memory _name, uint _dna) internal {
+    // Note: We chose not to prevent the year 2038 problem... So don't need
+    // worry about overflows on readyTime. Our app is screwed in 2038 anyway ;)
+    uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
+    zombieToOwner[id] = msg.sender;
+    // 3. Let's use SafeMath's `add` here:
+    ownerZombieCount[msg.sender] =ownerZombieCount[msg.sender].add(1);
+    emit NewZombie(id, _name, _dna);
+  }
 
-    function createRandomZombie(string memory _name) public {
-        require(ownerZombieCount[msg.sender] == 0);
-        uint randDna = _generateRandomDna(_name);
-        randDna = randDna - randDna % 100;
-        _createZombie(_name, randDna);
-    }
+  function _generateRandomDna(string memory _str) private view returns (uint) {
+    uint rand = uint(keccak256(abi.encodePacked(_str)));
+    return rand % dnaModulus;
+  }
+
+  function createRandomZombie(string memory _name) public {
+    require(ownerZombieCount[msg.sender] == 0);
+    uint randDna = _generateRandomDna(_name);
+    randDna = randDna - randDna % 100;
+    _createZombie(_name, randDna);
+  }
 
 }
+
 
 
 //Chapter 3.2 Ownable Contracts
@@ -87,3 +96,8 @@ A uint8 is too small, since 2^8 = 256 — if our zombies attacked once per day, 
 But 2^16 is 65536 — so unless a user wins or loses every day for 179 years straight, we should be safe here.
 Now that we have new properties on our Zombie struct, we need to change our function definition in _createZombie().
 Change the zombie creation definition so it creates each new zombie with 0 wins and 0 losses.
+
+Chapter 5.11:
+Declare that we're using SafeMath32 for uint32.
+Declare that we're using SafeMath16 for uint16.
+There's one more line of code in ZombieFactory where we should use a SafeMath method. We've left a comment to indicate where.
